@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: static-website
-        image: AbinTony/static-website:replaceImageTag
+        image: abintony/static-website:10
         ports:
         - containerPort: 80
         resources:
