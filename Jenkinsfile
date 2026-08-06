@@ -31,14 +31,14 @@ pipeline {
         stage('Build and Push Docker Image') {
             environment {
                 DOCKER_IMAGE = "abintony/static-website:${BUILD_NUMBER}"
+                REGISTRY_CREDENTIALS = credentials('docker-cred')
             }
             steps {
                 script {
-                    sh "docker build -t ${DOCKER_IMAGE} ."
+                    sh 'docker build -t ${DOCKER_IMAGE} .'
 
                     def dockerImage = docker.image("${DOCKER_IMAGE}")
-
-                    docker.withRegistry('https://index.docker.io/v1/', 'docker-cred') {
+                    docker.withRegistry('https://index.docker.io/v1/', "docker-cred") {
                         dockerImage.push()
                         dockerImage.push("latest")
                     }
@@ -52,9 +52,7 @@ pipeline {
                 GIT_USER_NAME = "Abintony24"
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'github',
-                                                  usernameVariable: 'GIT_USER',
-                                                  passwordVariable: 'GITHUB_TOKEN')]) {
+                withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
                     sh '''
                         git config user.email "abintony24@gmail.com"
                         git config user.name "${GIT_USER_NAME}"
@@ -69,6 +67,5 @@ pipeline {
                 }
             }
         }
-
     }
 }
